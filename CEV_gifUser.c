@@ -13,7 +13,6 @@
 #include "CEV_gifDeflate.h"
 #include "CEV_gifToSurface.h"
 #include "CEV_gif.h"
-#include "rwtypes.h"
 
 
 

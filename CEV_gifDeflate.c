@@ -11,7 +11,6 @@
 #include <string.h>
 #include <errno.h>
 #include <SDL.h>
-#include "rwtypes.h"
 #include "CEV_gif.h"
 #include "CEV_gifDeflate.h"
 #include "CEV_gifToSurface.h"
@@ -339,6 +338,7 @@ void L_gifFileFree(L_GifFile *gif)
         free(gif->image[i].localColor.table);
         free(gif->image[i].imageData);
     }
+
     if(gif->globalColor.table != NULL)
         free(gif->globalColor.table);
 
