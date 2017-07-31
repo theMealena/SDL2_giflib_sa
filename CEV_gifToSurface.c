@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <SDL.h>
-#include "project_def.h"
+//#include "project_def.h"
 #include "CEV_gifToSurface.h"
 #include "CEV_gif.h"
 
