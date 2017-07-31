@@ -55,7 +55,7 @@ CEV_GifAnim * CEV_gifAnimLoadRW(SDL_RWops* rwops, SDL_Renderer *renderer, char f
     if (rwops == NULL || renderer == NULL)
         return NULL;
 
-    readWriteErr = 0;
+    CEV_gifReadWriteErr = 0;
 
         /*EXE*/
 
@@ -140,7 +140,7 @@ CEV_GifAnim * CEV_gifAnimLoadRW(SDL_RWops* rwops, SDL_Renderer *renderer, char f
     /*be ready to display first logical frame in case of no call to SDL_GIFAnimAuto*/
     L_gifBlit(anim);
 
-    if(readWriteErr)/*well.. wait and see if it's a problem*/
+    if(CEV_gifReadWriteErr)/*well.. wait and see if it's a problem*/
         fprintf(stderr,"Warn / SDL_GIFAnimLoad : some R/W err has occured, file may be unstable\n");
 
         /*POST**/

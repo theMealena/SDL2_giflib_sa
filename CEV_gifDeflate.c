@@ -2,7 +2,6 @@
 //** Done by  |      Date     |  version |    comment     **/
 //**------------------------------------------------------**/
 //**   CEV    |    05-2016    |   1.0    |  creation/SDL2 **/
-//**   CEV    |  06-04-2017   |   1.1    |  life test     **/ //memory leak in L_gifFileFree suppressed
 //**********************************************************/
 
 
@@ -12,7 +11,6 @@
 #include <string.h>
 #include <errno.h>
 #include <SDL.h>
-#include "project_def.h"
 #include "rwtypes.h"
 #include "CEV_gif.h"
 #include "CEV_gifDeflate.h"
@@ -119,7 +117,7 @@ L_GifFile *L_gifLoadRW(SDL_RWops* file)
     unsigned char
                 endOfFile=0;
 
-    readWriteErr = 0;
+    CEV_gifReadWriteErr = 0;
 
     /*creating new gif structure*/
     gif = L_gifCreate();
@@ -137,7 +135,7 @@ L_GifFile *L_gifLoadRW(SDL_RWops* file)
     if (gif->lsd.packField.usesGlobalColor)
         L_gifColorTabFillRW(gif->lsd.packField.numOfColors, &gif->globalColor, file);    /*function checked*/
 
-    while(!endOfFile && !readWriteErr)
+    while(!endOfFile && !CEV_gifReadWriteErr)
     {
         uint8_t dataType = SDL_ReadU8(file);
 
@@ -158,7 +156,7 @@ L_GifFile *L_gifLoadRW(SDL_RWops* file)
 
             default :
                 fprintf(stderr,"Err / CEV_LoadGif : Unexpected value :%d\n", dataType);
-                readWriteErr++;
+                CEV_gifReadWriteErr++;
             break;
         }
     }
@@ -195,10 +193,10 @@ int L_gifExtFillRW(L_GifFile *gif, SDL_RWops* file)
     }
 
 
-    if(readWriteErr)
+    if(CEV_gifReadWriteErr)
         fprintf(stderr,"CEV_GifFillExt : W/R error occured.\n");
 
-    return (readWriteErr)? GIF_ERR : GIF_OK;
+    return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
@@ -341,7 +339,6 @@ void L_gifFileFree(L_GifFile *gif)
         free(gif->image[i].localColor.table);
         free(gif->image[i].imageData);
     }
-
     if(gif->globalColor.table != NULL)
         free(gif->globalColor.table);
 
@@ -407,10 +404,10 @@ int L_gifHeaderFillRW(L_GifHeader* header, SDL_RWops* file)
 
     header->signature[3] = header->version[3] = '\0';
 
-    if(readWriteErr)
+    if(CEV_gifReadWriteErr)
         fprintf(stderr,"R/W error while filling Header.\n");
 
-    return (readWriteErr)? GIF_ERR : GIF_OK;
+    return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
@@ -431,15 +428,15 @@ int L_gifComExtFillRW(L_GifComExt *ext, SDL_RWops* file)
 
     if(SDL_RWread(file, ext->text, 1, temp) != temp)
 
-        readWriteErr++;
+        CEV_gifReadWriteErr++;
 
     /*debug supprimé ici*/
     /*ext->text[temp-1]='\0';*/
 
-    if(readWriteErr)
+    if(CEV_gifReadWriteErr)
         fprintf(stderr,"R/W error while filling Comment Extension.\n");
 
-    return (readWriteErr)? GIF_ERR : GIF_OK;
+    return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
@@ -458,10 +455,10 @@ int L_gifLsdFillRW(L_GifLSD* lsd, SDL_RWops* file)
     temp                    = SDL_ReadU8(file);/*useless info*/
     lsd->pxlAspectRatio     = (temp + 15) / 64;
 
-    if(readWriteErr)
+    if(CEV_gifReadWriteErr)
         fprintf(stderr,"R/W error while filling Logical Screen Descriptor.\n");
 
-    return (readWriteErr)? GIF_ERR : GIF_OK;
+    return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
@@ -475,10 +472,10 @@ int L_gifLsdPackFillRW(L_GifLSDpack* pack, SDL_RWops* file)
     pack->sorted            = (temp & 0x08)? 1: 0;
     pack->numOfColors       = 1 << ((temp & 0x07)+1);
 
-    if(readWriteErr)
+    if(CEV_gifReadWriteErr)
         fprintf(stderr,"R/W error while filling Logical Screen Descriptor Pack.\n");
 
-    return (readWriteErr)? GIF_ERR : GIF_OK;
+    return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
@@ -505,10 +502,10 @@ int L_gifColorTabFillRW(unsigned int numOfColor, L_GifColorTable *colors, SDL_RW
         colors->table[i].a = 0xff;
     }
 
-    if(readWriteErr)
+    if(CEV_gifReadWriteErr)
         fprintf(stderr,"R/W error while filling Color table.\n");
 
-    return (readWriteErr)? GIF_ERR : GIF_OK;
+    return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
@@ -522,10 +519,10 @@ int L_gifGceFillRW(L_GifGCE* gce, SDL_RWops* file)
     SDL_ReadU8(file); /*read garbage byte*/
     gce->used = 1;
 
-    if(readWriteErr)
+    if(CEV_gifReadWriteErr)
         fprintf(stderr,"R/W error while filling Graphic Contol Extension._n");
 
-    return (readWriteErr)? GIF_ERR : GIF_OK;
+    return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
@@ -541,10 +538,10 @@ int L_gifGcePackFillRW(L_GifGCEPack* pack, SDL_RWops* file)
     pack->userInput         = (temp & 0x02)>>1;
     pack->alphaFlag         = temp & 0x01;
 
-    if(readWriteErr)
+    if(CEV_gifReadWriteErr)
         fprintf(stderr,"R/W error while filling Graphic Contol Extension Pack.\n");
 
-    return (readWriteErr)? GIF_ERR : GIF_OK;
+    return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
@@ -558,10 +555,10 @@ int L_gifIdFillRW(L_GifID* gifid, SDL_RWops* file)
 
     L_gifIdPackFillRW(&gifid->imgPack, file);
 
-    if(readWriteErr)
+    if(CEV_gifReadWriteErr)
         fprintf(stderr,"R/W error while filling Image Descriptor.\n");
 
-    return (readWriteErr)? GIF_ERR : GIF_OK;
+    return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
@@ -578,10 +575,10 @@ int L_gifIdPackFillRW(L_GifIDpack* IDpack, SDL_RWops* file)
     IDpack->res             = (temp & 0x18)? 1 : 0;
     IDpack->colorTabSize    = 1 << ((temp & 0x07)+1);
 
-    if(readWriteErr)
+    if(CEV_gifReadWriteErr)
         fprintf(stderr,"R/W error while filling Image Descriptor Pack.\n");
 
-    return (readWriteErr)? GIF_ERR : GIF_OK;
+    return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
