@@ -13,8 +13,6 @@
 #define GIF_FORWARD     0
 #define GIF_BACKWARD    1
 
-#define VERB 0
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,18 +33,19 @@ typedef enum GIF_MODE
 GIF_MODE;
 
 
-/** \brief errors
- */
+
 enum
 {
     GIF_FATAL   = -2,
     GIF_ERR     = -1,
-    GIF_OK      = 0};
-
+    GIF_OK      = 0
+};
 
 /** \brief gif animation instance
  */
 typedef struct CEV_GifAnim CEV_GifAnim;
+
+char CEV_gifReadWriteErr;
 
 
 /** \brief Loads gif file.
