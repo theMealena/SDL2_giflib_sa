@@ -99,6 +99,7 @@ void L_gifFillSurfaceInterlace(uint8_t *pixels, L_GifFile* gif, int index)
 
         default :/*shits happen...*/
             fprintf(stderr,"Err/ In function GifFillSurfaceInterlace : color table undefined.\n");
+            return;
         break;
     }
 

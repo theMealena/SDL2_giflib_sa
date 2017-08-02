@@ -123,7 +123,7 @@ L_GifFile *L_gifLoadRW(SDL_RWops* file)
 
     if (gif == NULL)
     {/*on error*/
-        fprintf(stderr,"Err / CEV_LoadGIF : unable to create gif structure.\n");
+        fprintf(stderr,"Err / CEV_LoadGIFRW : unable to create gif structure.\n");
         goto err1;
     }
 
@@ -154,7 +154,7 @@ L_GifFile *L_gifLoadRW(SDL_RWops* file)
             break;
 
             default :
-                fprintf(stderr,"Err / CEV_LoadGif : Unexpected value :%d\n", dataType);
+                fprintf(stderr,"Err / CEV_LoadGifRW : Unexpected value :%d\n", dataType);
                 CEV_gifReadWriteErr++;
             break;
         }
@@ -382,7 +382,7 @@ void L_gifDataFillRW(L_GifFile *gif, SDL_RWops* file)
         rawDataSize +=  subBlockSize;   /*increase datasize by blocksize*/
     }
 
-    /*pass data through lzw decomp*/
+    /*pass data through lzw deflate*/
     L_gifLzw(rawData, gif, LZWminiCodeSize);
 
 err :
