@@ -20,13 +20,13 @@ extern "C" {
 #endif
 
 /** \brief gif method
- */
+
 typedef enum GIF_METHOD
 {
     METHOD_OVERWRITE  = 1,
     METHOD_REDRAW     = 2
 }
-GIF_METHOD;
+GIF_METHOD;*/
 
 
 /** \brief animation inner frame structure

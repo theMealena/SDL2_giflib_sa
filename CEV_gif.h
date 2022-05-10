@@ -9,7 +9,6 @@
 #define GIFUSER_H_INCLUDED
 
 #include <SDL.h>
-//#include "CEV_gifToSurface.h"
 
 #define GIF_FORWARD     0
 #define GIF_BACKWARD    1
@@ -19,35 +18,47 @@ extern "C" {
 #endif
 
 
-/** \brief reading mode
+/** \brief Reading mode
  */
 typedef enum GIF_MODE
 {
     GIF_ALL        = -1,
-    GIF_REPEAT_FOR = 0,
-    GIF_ONCE_FOR   = 1,
-    GIF_FORTH_BACK = 2,
-    GIF_REPEAT_REV = 3,
-    GIF_ONCE_REV   = 4,
-    GIF_STOP       = 5
+    GIF_REPEAT_FOR = 0, /**< Loops forward */
+    GIF_ONCE_FOR   = 1, /**< Plays forward once and stops */
+    GIF_FORTH_BACK = 2, /**< Alternates forward/backward */
+    GIF_REPEAT_REV = 3, /**< Loops backward */
+    GIF_ONCE_REV   = 4, /**< Plays backward once and stops*/
+    GIF_STOP       = 5  /**< Stops active animation*/
 }
 GIF_MODE;
 
 
-/** \brief function return values
+/** \brief Gif method.
+ */
+typedef enum GIF_METHOD
+{
+    METHOD_OVERWRITE  = 1, /**< New frame superposes actual */
+    METHOD_REDRAW     = 2  /**< Clears frame and redraw */
+}
+GIF_METHOD;
+
+
+/** \brief Functions return values.
  */
 enum
 {
-    GIF_FATAL   = -2,
-    GIF_ERR     = -1,
-    GIF_OK      = 0
+    GIF_FATAL   = -2,   /**< Fatal, unrecoverable error occurred, doom on its way... */
+    GIF_ERR     = -1,   /**< Some error occured, still possible to find a way out */
+    GIF_OK      = 0     /**< Everything is ok */
 };
 
-/** \brief gif animation instance
+
+/** \brief Gif animation instance.
  */
 typedef struct CEV_GifAnim CEV_GifAnim;
 
-char CEV_gifReadWriteErr;
+
+char CEV_gifReadWriteErr;/**< Any file r/w error occurred */
 
 
 /** \brief Loads gif file.
@@ -60,7 +71,7 @@ char CEV_gifReadWriteErr;
 CEV_GifAnim * CEV_gifAnimLoad(const char* fileName, SDL_Renderer *renderer);
 
 
-/** \brief load gif file from SDL_RWops
+/** \brief Loads gif file from SDL_RWops.
  *
  * \param rwops : SDL_RWops* to load gif from.
  * \param renderer : SDL_Renderer* animation will be related to.
@@ -71,7 +82,7 @@ CEV_GifAnim * CEV_gifAnimLoad(const char* fileName, SDL_Renderer *renderer);
 CEV_GifAnim * CEV_gifAnimLoadRW(SDL_RWops* rwops, SDL_Renderer *renderer, char freeSrc);
 
 
-/** \brief gif comment.
+/** \brief Fetches gif comment.
  *
  * \param anim : CEV_GifAnim* to extract comment from.
  *
@@ -81,7 +92,7 @@ char *CEV_gifComment(CEV_GifAnim *anim);
 
 
 
-/** \brief gif version
+/** \brief Fetches gif version.
  *
  * \param anim : CEV_GifAnim* to extract version from.
  *
@@ -90,7 +101,7 @@ char *CEV_gifComment(CEV_GifAnim *anim);
 char *CEV_gifVersion(CEV_GifAnim *anim);
 
 
-/** \brief gif version
+/** \brief Fetches gif signature.
  *
  * \param anim : CEV_GifAnim* to extract version from.
  *
@@ -99,7 +110,7 @@ char *CEV_gifVersion(CEV_GifAnim *anim);
 char *CEV_gifSignature(CEV_GifAnim *anim);
 
 
-/** \brief User's texture.
+/** \brief Fetches user's texture.
  *
  * \param anim : CEV_GifAnim* to get texture from.
  *
@@ -108,7 +119,7 @@ char *CEV_gifSignature(CEV_GifAnim *anim);
 SDL_Texture *CEV_gifTexture(CEV_GifAnim *anim);
 
 
-/** \brief  Number of pictures.
+/** \brief Fetches number of frames.
  *
  * \param anim : CEV_GifAnim* to get info from.
  *
@@ -117,11 +128,11 @@ SDL_Texture *CEV_gifTexture(CEV_GifAnim *anim);
 int CEV_gifFrameNum(CEV_GifAnim *anim);
 
 
-/** \brief forces skip to next frame.
+/** \brief Forces skip to next frame.
  *
  * \param anim : CEV_GifAnim* to modify.
  *
- * \return N/A
+ * \return N/A.
  */
 void CEV_gifFrameNext(CEV_GifAnim *anim);
 
@@ -137,14 +148,14 @@ void CEV_gifFrameNext(CEV_GifAnim *anim);
 void CEV_gifTimeSet(CEV_GifAnim *anim, unsigned int index, uint16_t timeMs);
 
 
-/** \brief sets loop reading mode.
+/** \brief Sets loop reading mode.
  *
  * \param anim : CEV_GifAnim* to modify.
  * \param loopMode : read mode to apply.
  *
- * \return N/A
+ * \return N/A.
  *
- * \sa _GIF_MODE
+ * \sa GIF_MODE
  */
 void CEV_gifLoopMode(CEV_GifAnim *anim, unsigned int loopMode);
 
@@ -158,7 +169,7 @@ void CEV_gifLoopMode(CEV_GifAnim *anim, unsigned int loopMode);
 void CEV_gifLoopReset(CEV_GifAnim *anim);
 
 
-/** \brief updates animation.
+/** \brief Updates animation.
  *
  * \param anim : CEV_GifAnim* to animate.
  *
@@ -167,7 +178,7 @@ void CEV_gifLoopReset(CEV_GifAnim *anim);
 char CEV_gifAnimAuto(CEV_GifAnim *anim);
 
 
-/** \brief reverses play mode
+/** \brief Reverses play mode.
  *
  * \param anim CEV_GifAnim* to modify.
  *
@@ -176,16 +187,16 @@ char CEV_gifAnimAuto(CEV_GifAnim *anim);
 void CEV_gifReverse(CEV_GifAnim *anim);
 
 
-/** \brief frees animation structure content and itself
+/** \brief Frees animation structure content and itself.
  *
  * \param anim : CEV_GifAnim* to free.
  *
- * \return N/A
+ * \return N/A.
  */
 void CEV_gifAnimFree(CEV_GifAnim *anim);
 
 
-/** \brief Loop status.
+/** \brief Queries loop status.
  *
  * \param anim : CEV_GifAnim* to check.
  *
@@ -194,19 +205,19 @@ void CEV_gifAnimFree(CEV_GifAnim *anim);
 char CEV_gifLoopStatus(CEV_GifAnim *anim);
 
 
-/** \brief queries display method.
+/** \brief Queries display method.
  *
  * \param anim : CEV_GifAnim* to query.
  * \param index : frame to query.
  *
  * \return frame method.
  *
- * \sa _GIF_METHOD
+ * \sa GIF_METHOD
  */
 char CEV_gifMethod(CEV_GifAnim* anim, unsigned int index);
 
-/**sets method**/
-/** \brief sets display method
+
+/** \brief Sets display method.
  *
  * \param anim : CEV_GifAnim* to modify.
  * \param index : frame to modify or GIF_ALL for all frames.
@@ -214,7 +225,7 @@ char CEV_gifMethod(CEV_GifAnim* anim, unsigned int index);
  *
  * \return N/A.
  *
- * \sa _GIF_METHOD
+ * \sa GIF_METHOD
  */
 void CEV_gifMethodSet(CEV_GifAnim* anim, int index, uint8_t method);
 

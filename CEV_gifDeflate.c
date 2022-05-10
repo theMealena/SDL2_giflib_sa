@@ -19,7 +19,7 @@
 /***Local Structures declarations****/
 
 typedef struct L_GifDicoEntry
-{/*dictionnary element*/
+{//dictionnary element
     int16_t prev;
     uint8_t value;
 }
@@ -27,7 +27,7 @@ L_GifDicoEntry;//local
 
 
 typedef struct L_GifDico
-{/*full lzw dictionnary*/
+{//full lzw dictionnary
     L_GifDicoEntry  entry[4096];
     uint16_t        actSize;
 }
@@ -109,7 +109,7 @@ void L_gifStreamValueOutput(uint8_t, uint8_t*, unsigned int*, unsigned int);//lo
 /***Functions Implementation**/
 
 L_GifFile *L_gifLoadRW(SDL_RWops* file)
-{/*create gif handler*/
+{//creates gif handler
 
     L_GifFile *gif = NULL;
 
@@ -118,43 +118,43 @@ L_GifFile *L_gifLoadRW(SDL_RWops* file)
 
     CEV_gifReadWriteErr = 0;
 
-    /*creating new gif structure*/
+    //creating new gif structure
     gif = L_gifCreate();
 
     if (gif == NULL)
     {/*on error*/
-        fprintf(stderr,"Err / CEV_LoadGIFRW : unable to create gif structure.\n");
+        fprintf(stderr,"Err at %s %d : unable to create gif structure.\n", __FUNCTION__, __LINE__);
         goto err1;
     }
 
-    L_gifHeaderFillRW(&gif->header, file);  /*Mandatory / function checked*/
-    L_gifLsdFillRW(&gif->lsd, file);        /*Mandatory / function checked*/
+    L_gifHeaderFillRW(&gif->header, file);  //Mandatory / function checked
+    L_gifLsdFillRW(&gif->lsd, file);        //Mandatory / function checked
 
-    /*Global color table reading*/
+    //Global color table reading
     if (gif->lsd.packField.usesGlobalColor)
-        L_gifColorTabFillRW(gif->lsd.packField.numOfColors, &gif->globalColor, file);    /*function checked*/
+        L_gifColorTabFillRW(gif->lsd.packField.numOfColors, &gif->globalColor, file);    //function checked
 
     while(!endOfFile && !CEV_gifReadWriteErr)
     {
         uint8_t dataType = SDL_ReadU8(file);
 
         switch(dataType)
-        {/*switch next data type*/
+        {//switch next data type
 
-            case 0x21 : /*file extensions*/
+            case 0x21 : //file extensions
                 L_gifExtFillRW(gif, file);
             break;
 
-            case 0x2C : /*Image Descriptor*/
+            case 0x2C : //Image Descriptor
                 L_gifImgNewRW(gif, file);
             break;
 
-            case 0x3B :/*EOF*/
+            case 0x3B ://EOF
                 endOfFile = 1;
             break;
 
             default :
-                fprintf(stderr,"Err / CEV_LoadGifRW : Unexpected value :%d\n", dataType);
+                fprintf(stderr,"Err at %s %d : Unexpected value :%d\n", __FUNCTION__, __LINE__, dataType);
                 CEV_gifReadWriteErr++;
             break;
         }
@@ -167,40 +167,40 @@ err1:
 
 
 int L_gifExtFillRW(L_GifFile *gif, SDL_RWops* file)
-{/*fills misc extension blocks*/
+{//fills misc extension blocks
 
     switch(SDL_ReadU8(file))
-    {/*switch file extension type*/
+    {//switch file extension type
 
-        case 0xf9 : /*Graphics Control Extension*/
-            L_gifGceFillRW(&gif->gce, file);/*vérifié*/
+        case 0xf9 : //Graphics Control Extension
+            L_gifGceFillRW(&gif->gce, file);//checked
         break;
 
-        /* TODO (cedric#1#): eventually to be taken into consideration but why ? */
-        case 0x01 :/*Plain Text extension*/
-        case 0xff :/*Application Extension*/
-            L_gifBlockSkipRW(file);
+        //TODO (cev#1#): eventually to be taken into consideration but why ?
+        case 0x01 ://Plain Text extension
+        case 0xff ://Application Extension
+            L_gifBlockSkipRW(file);//skipping block, useless for what we wanna do
         break;
 
-        case 0xfe :/*Comment Extension*/
+        case 0xfe ://Comment Extension
             L_gifComExtFillRW(&gif->comExt, file);
         break;
 
         default :
-            fprintf(stderr,"Err / CEV_GifFillExt : Unknow file extension type has occured\n");
+            fprintf(stderr,"Err at %s %d : Unknow file extension type has occured\n", __FUNCTION__, __LINE__);
         break;
     }
 
 
     if(CEV_gifReadWriteErr)
-        fprintf(stderr,"CEV_GifFillExt : W/R error occured.\n");
+        fprintf(stderr,"Warning at %s %d : W/R error occured.\n", __FUNCTION__, __LINE__);
 
     return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
 L_GifFile *L_gifCreate()
-{/*allocates and fills new structure*/
+{//allocates and fills new structure
 
     L_GifFile *newgif = NULL;
 
@@ -208,26 +208,26 @@ L_GifFile *L_gifCreate()
 
     if(newgif == NULL)
     {
-        fprintf(stderr,"Err /CEV_GifFile Unable to malloc : %s\n", strerror(errno));
+        fprintf(stderr,"Err at %s %d : Unable to malloc : %s\n", __FUNCTION__, __LINE__, strerror(errno));
         return NULL;
     }
 
-    /*initializing values & pointers*/
+    //initializing values & pointers
     newgif->imgNum                  = 0;
     newgif->image                   = NULL;
     newgif->globalColor.numOfColors = 0;
     newgif->globalColor.table       = NULL;
 
-    /*init header*/
+    //init header
     L_gifHeaderInit(&newgif->header);
 
-    /*init graphic control extension*/
+    //init graphic control extension
     L_gifGceInit(&newgif->gce);
 
-    /*init lsd*/
+    //init lsd
     L_gifLsdInit(&newgif->lsd);
 
-    /*init comment extension*/
+    //init comment extension
     L_gifComExtInit(&newgif->comExt);
 
     return newgif;
@@ -235,7 +235,7 @@ L_GifFile *L_gifCreate()
 
 
 void L_gifHeaderInit(L_GifHeader *header)
-{/*header file init*/
+{//header file init
 
     memset(header->signature, 0, sizeof(header->signature));
     memset(header->version, 0, sizeof(header->version));
@@ -243,7 +243,7 @@ void L_gifHeaderInit(L_GifHeader *header)
 
 
 void L_gifGceInit(L_GifGCE *gce)
-{/*gce file init*/
+{//gce file init
 
     gce->alphaColorIndex = 0;
     gce->byteSize        = 0;
@@ -258,7 +258,7 @@ void L_gifGceInit(L_GifGCE *gce)
 
 
 void L_gifLsdInit (L_GifLSD *lsd)
-{/*lsd file init*/
+{//lsd file init
 
     lsd->bckgrdColorIndex = 0;
     lsd->height           = 0;
@@ -273,7 +273,7 @@ void L_gifLsdInit (L_GifLSD *lsd)
 
 
 void L_gifComExtInit(L_GifComExt* comment)
-{/*comment extension init*/
+{//comment extension init
 
     comment->numOfBlocks = 0;
     comment->text        = NULL;
@@ -281,14 +281,14 @@ void L_gifComExtInit(L_GifComExt* comment)
 
 
 void L_gifImgNewRW(L_GifFile *gif, SDL_RWops* file)
-{/*allocate and fills image information*/
+{//allocate and fills image information
 
-    int frameIndex = gif->imgNum;/*rw purpose*/
+    int frameIndex = gif->imgNum;//rw purpose
 
-    /*temporay image data*/
+    //temporay image data
     L_GifImage *temp = NULL;
 
-    /*one more frame to come*/
+    //one more frame to come
     gif->imgNum ++;
 
     temp = realloc(gif->image, gif->imgNum * sizeof(L_GifImage));
@@ -296,40 +296,40 @@ void L_gifImgNewRW(L_GifFile *gif, SDL_RWops* file)
     if (temp != NULL)
         gif->image = temp;
     else
-    {/*on error*/
-        fprintf(stderr, "Err / L_gifImgNewRW : unable to allocate :%s\n", strerror(errno));
+    {//on error
+        fprintf(stderr, "Err at %s %d : unable to allocate :%s\n", __FUNCTION__, __LINE__, strerror(errno));
         gif->imgNum --;
         return;
     }
 
     if(gif->gce.used)
-    {/*if graphic Control Extension was read before*/
-        gif->image[frameIndex].control = gif->gce; /*store into new picture*/
+    {//if graphic Control Extension was read before
+        gif->image[frameIndex].control = gif->gce; //stores into new picture
     }
 
 
-    /*fills Image Descriptor*/
+    //fills Image Descriptor
     L_gifIdFillRW(&gif->image[frameIndex].descriptor, file);
 
 
 
     if (gif->image[frameIndex].descriptor.imgPack.usesLocalColor)
-    {/*if there is a local color table*/
+    {//if there is a local color table
         L_gifColorTabFillRW(gif->image[frameIndex].descriptor.imgPack.colorTabSize, &gif->image[frameIndex].localColor, file);
     }
     else
-    {/*default values*/
+    {//default values
         gif->image[frameIndex].localColor.numOfColors    = 0;
         gif->image[frameIndex].localColor.table          = NULL;
     }
 
-    /*restores raw data into pixels table*/
+    //restores raw data into pixels table
     L_gifDataFillRW(gif, file);
 }
 
 
 void L_gifFileFree(L_GifFile *gif)
-{/*free all gif structure allocations*/
+{//free all gif structure allocations
 
     int i;
 
@@ -349,40 +349,40 @@ void L_gifFileFree(L_GifFile *gif)
 
 
 void L_gifDataFillRW(L_GifFile *gif, SDL_RWops* file)
-{/*read raw data sublock and send it thru lzw decompression*/
+{//reads raw data sublock and send it thru lzw decompression
 
     uint8_t
-            *rawData    = NULL, /*data field only*/
-            *temp       = NULL; /*temporary*/
+            *rawData    = NULL, //data field only
+            *temp       = NULL; //temporary
 
     unsigned char
-                LZWminiCodeSize = 0, /*min code size*/
-                subBlockSize    = 0; /*size of data sub block*/
+                LZWminiCodeSize = 0, //min code size
+                subBlockSize    = 0; //size of data sub block
 
-    size_t rawDataSize = 0; /*raw data full size in bytes*/
+    size_t rawDataSize = 0; //raw data full size in bytes
 
     LZWminiCodeSize = SDL_ReadU8(file);
 
-    while((subBlockSize = SDL_ReadU8(file))) /*a size of 0 means no data to follow*/
-    {/*fill rawData with subBlocks datas*/
+    while((subBlockSize = SDL_ReadU8(file))) //a size of 0 means no data to follow
+    {//fill rawData with subBlocks datas
 
-        temp = realloc(rawData, rawDataSize + subBlockSize);/*alloc/realloc volume for new datas*/
+        temp = realloc(rawData, rawDataSize + subBlockSize);//alloc/realloc volume for new datas
 
-        if (temp != NULL)/*realloc is ok*/
+        if (temp != NULL)//realloc is ok
             rawData = temp;
         else
-        {/*on error*/
-            fprintf(stderr, "Err / CEV_fillImgData : realloc error. %s\n", strerror(errno));
+        {//on error
+            fprintf(stderr, "Err at %s %d : realloc error. %s\n", __FUNCTION__, __LINE__, strerror(errno));
             goto err;
         }
 
-        /*fetch datas from SDL_RWops*/
+        //fetch datas from SDL_RWops
         SDL_RWread(file, rawData+rawDataSize, sizeof(uint8_t), subBlockSize);
 
-        rawDataSize +=  subBlockSize;   /*increase datasize by blocksize*/
+        rawDataSize +=  subBlockSize;   //increasing datasize by blocksize
     }
 
-    /*pass data through lzw deflate*/
+    //passing data through lzw deflate
     L_gifLzw(rawData, gif, LZWminiCodeSize);
 
 err :
@@ -391,7 +391,7 @@ err :
 
 
 int L_gifHeaderFillRW(L_GifHeader* header, SDL_RWops* file)
-{/*fills header**/
+{//fills header
 
     int i;
 
@@ -405,14 +405,14 @@ int L_gifHeaderFillRW(L_GifHeader* header, SDL_RWops* file)
     header->signature[3] = header->version[3] = '\0';
 
     if(CEV_gifReadWriteErr)
-        fprintf(stderr,"R/W error while filling Header.\n");
+        fprintf(stderr, "Err at %s %d ; R/W error while filling Header.\n", __FUNCTION__, __LINE__);
 
     return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
 int L_gifComExtFillRW(L_GifComExt *ext, SDL_RWops* file)
-{/*fills comment extension*/
+{//fills comment extension
 
     uint8_t temp;
 
@@ -422,7 +422,7 @@ int L_gifComExtFillRW(L_GifComExt *ext, SDL_RWops* file)
     ext->text = malloc(temp * sizeof(char));
     if(ext->text == NULL)
     {
-        fprintf(stderr, "err / L_gifComExtFillRW : %s\n", strerror(errno));
+        fprintf(stderr, "Err at %s %d : %s\n", __FUNCTION__, __LINE__, strerror(errno));
         return GIF_ERR;
     }
 
@@ -430,18 +430,15 @@ int L_gifComExtFillRW(L_GifComExt *ext, SDL_RWops* file)
 
         CEV_gifReadWriteErr++;
 
-    /*debug supprimé ici*/
-    /*ext->text[temp-1]='\0';*/
-
     if(CEV_gifReadWriteErr)
-        fprintf(stderr,"R/W error while filling Comment Extension.\n");
+        fprintf(stderr, "Warning at %s %d :R/W error while filling Comment Extension.\n", __FUNCTION__, __LINE__);
 
     return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
 int L_gifLsdFillRW(L_GifLSD* lsd, SDL_RWops* file)
-{/*fills Logical Screen Descriptor*/
+{//fills Logical Screen Descriptor
 
     uint8_t temp;
 
@@ -450,20 +447,20 @@ int L_gifLsdFillRW(L_GifLSD* lsd, SDL_RWops* file)
 
     L_gifLsdPackFillRW(&lsd->packField, file);
 
-/* TODO (cedric#1#): background color unused ? W8&C if it ever becomes a problem */
+//TODO (cev#1#): background color unused ? W8&C if it ever becomes a problem
     lsd->bckgrdColorIndex   = SDL_ReadU8(file);
-    temp                    = SDL_ReadU8(file);/*useless info*/
+    temp                    = SDL_ReadU8(file);//useless info
     lsd->pxlAspectRatio     = (temp + 15) / 64;
 
     if(CEV_gifReadWriteErr)
-        fprintf(stderr,"R/W error while filling Logical Screen Descriptor.\n");
+        fprintf(stderr, "Warning at %s %d : R/W error while filling Logical Screen Descriptor.\n", __FUNCTION__, __LINE__);
 
     return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
 int L_gifLsdPackFillRW(L_GifLSDpack* pack, SDL_RWops* file)
-{/*extract LSD's packed flags*/
+{//extract LSD's packed flags
 
     uint8_t temp = SDL_ReadU8(file);
 
@@ -473,14 +470,14 @@ int L_gifLsdPackFillRW(L_GifLSDpack* pack, SDL_RWops* file)
     pack->numOfColors       = 1 << ((temp & 0x07)+1);
 
     if(CEV_gifReadWriteErr)
-        fprintf(stderr,"R/W error while filling Logical Screen Descriptor Pack.\n");
+        fprintf(stderr, "Warning at %s %d : R/W error while filling Logical Screen Descriptor Pack.\n", __FUNCTION__, __LINE__);
 
     return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
 int L_gifColorTabFillRW(unsigned int numOfColor, L_GifColorTable *colors, SDL_RWops* file)
-{/*fills color table*/
+{//fills color table
 
     int i;
 
@@ -488,7 +485,7 @@ int L_gifColorTabFillRW(unsigned int numOfColor, L_GifColorTable *colors, SDL_RW
 
     if (colors->table == NULL)
     {
-        fprintf(stderr, "Err CEV_fillColorTab : unable to allocate memory :%s\n", strerror(errno));
+        fprintf(stderr, "Err at %s %d : unable to allocate memory :%s\n", __FUNCTION__, __LINE__, strerror(errno));
         return GIF_ERR;
     }
 
@@ -503,31 +500,31 @@ int L_gifColorTabFillRW(unsigned int numOfColor, L_GifColorTable *colors, SDL_RW
     }
 
     if(CEV_gifReadWriteErr)
-        fprintf(stderr,"R/W error while filling Color table.\n");
+        fprintf(stderr,"Warning at %s %d : R/W error while filling Color table.\n", __FUNCTION__, __LINE__);
 
     return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
 int L_gifGceFillRW(L_GifGCE* gce, SDL_RWops* file)
-{/*fills Graphic Control Extension*/
+{//fills Graphic Control Extension
 
     gce->byteSize         = SDL_ReadU8(file);
     L_gifGcePackFillRW(&gce->packField, file);
     gce->delayTime        = SDL_ReadLE16(file);
     gce->alphaColorIndex  = SDL_ReadU8(file);
-    SDL_ReadU8(file); /*read garbage byte*/
+    SDL_ReadU8(file); //reading garbage byte
     gce->used = 1;
 
     if(CEV_gifReadWriteErr)
-        fprintf(stderr,"R/W error while filling Graphic Contol Extension._n");
+        fprintf(stderr, "Warning at %s %d : R/W error while filling Graphic Contol Extension.\n", __FUNCTION__, __LINE__);
 
     return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
 int L_gifGcePackFillRW(L_GifGCEPack* pack, SDL_RWops* file)
-{/*extract Graphic Control Extension's packed flags*/
+{//extracts Graphic Control Extension's packed flags
 
     uint8_t temp;
 
@@ -539,14 +536,14 @@ int L_gifGcePackFillRW(L_GifGCEPack* pack, SDL_RWops* file)
     pack->alphaFlag         = temp & 0x01;
 
     if(CEV_gifReadWriteErr)
-        fprintf(stderr,"R/W error while filling Graphic Contol Extension Pack.\n");
+        fprintf(stderr, "Warning at %s %d : R/W error while filling Graphic Contol Extension Pack.\n", __FUNCTION__, __LINE__);
 
     return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
 int L_gifIdFillRW(L_GifID* gifid, SDL_RWops* file)
-{/*fills Image Descriptor*/
+{//fills Image Descriptor
 
     gifid->leftPos   = SDL_ReadLE16(file);
     gifid->topPos    = SDL_ReadLE16(file);
@@ -556,14 +553,14 @@ int L_gifIdFillRW(L_GifID* gifid, SDL_RWops* file)
     L_gifIdPackFillRW(&gifid->imgPack, file);
 
     if(CEV_gifReadWriteErr)
-        fprintf(stderr,"R/W error while filling Image Descriptor.\n");
+        fprintf(stderr, "Warning at %s %d : R/W error while filling Image Descriptor.\n", __FUNCTION__, __LINE__);
 
     return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
 int L_gifIdPackFillRW(L_GifIDpack* IDpack, SDL_RWops* file)
-{/*extract Image Descriptor's packed flag*/
+{//extracts Image Descriptor's packed flag
 
     uint8_t temp;
 
@@ -576,14 +573,14 @@ int L_gifIdPackFillRW(L_GifIDpack* IDpack, SDL_RWops* file)
     IDpack->colorTabSize    = 1 << ((temp & 0x07)+1);
 
     if(CEV_gifReadWriteErr)
-        fprintf(stderr,"R/W error while filling Image Descriptor Pack.\n");
+        fprintf(stderr, "Warning at %s %d : R/W error while filling Image Descriptor Pack.\n", __FUNCTION__, __LINE__);
 
     return (CEV_gifReadWriteErr)? GIF_ERR : GIF_OK;
 }
 
 
 void L_gifBlockSkipRW(SDL_RWops* file)
-{/*skip useless subBlock in SDL_RWops*/
+{//skips useless subBlock in SDL_RWops
 
     uint8_t temp;
 
@@ -593,21 +590,19 @@ void L_gifBlockSkipRW(SDL_RWops* file)
 
 
 void L_gifLzw(void *codeStream, L_GifFile *gif, unsigned int lzwMinCode)
-{/*LZW Decompression*/
+{//LZW Decompression
 
-    /*** DECLARATIONS ***/
-
-    unsigned int bitPtr     = 0,   /*actual bit position in codestream*/
-                 count      = 0,   /*count of index output*/
+    unsigned int bitPtr     = 0,   //actual bit position in codestream
+                 count      = 0,   //count of index output
                  indexNum   = gif->image[gif->imgNum-1].descriptor.width * gif->image[gif->imgNum-1].descriptor.height;
 
-    uint8_t *indexStream    =  NULL; /*result*/
+    uint8_t *indexStream    =  NULL; //result
 
-    size_t maskSize = lzwMinCode +1; /*size of mask used to read bitstream in code Stream*/
+    size_t maskSize = lzwMinCode +1; //size of mask used to read bitstream in code Stream
 
     uint16_t
-            actCodeValue    = 0,/*actual code value*/
-            prevCodeValue   = 0;/*previous code value*/
+            actCodeValue    = 0,//actual code value
+            prevCodeValue   = 0;//previous code value
 
     const uint16_t
             resetCode       = 1<<lzwMinCode,
@@ -616,29 +611,27 @@ void L_gifLzw(void *codeStream, L_GifFile *gif, unsigned int lzwMinCode)
     L_GifDico codeTable;
     L_GifDicoEntry prevString;
 
-    /*** PRL ***/
+
 
     indexStream = malloc(indexNum *sizeof(uint8_t));
 
     if(indexStream == NULL)
     {
-        fprintf(stderr, "gifLZW : unable to allocate indexStream : %s\n", strerror(errno));
+        fprintf(stderr, "Err at %s %d : unable to allocate indexStream : %s\n", __FUNCTION__, __LINE__, strerror(errno));
         return;
     }
 
-    /*** EXECUTION ***/
-
     while(count<indexNum)
-    {/*starts loop*/
+    {//starts loop
 
-        /*read value in code stream*/
+        //read value in code stream
         actCodeValue  = L_gifGetBitFieldValue16(codeStream, &bitPtr, maskSize);
 
         if(actCodeValue == resetCode)
-        {/*reinit dico if reset code*/
+        {//reinit dico if reset code
 
-            L_gifDicoInit(&codeTable, resetCode); /*CodeTable init*/
-            maskSize    = lzwMinCode +1;            /*maskSize init*/
+            L_gifDicoInit(&codeTable, resetCode); //CodeTable init
+            maskSize    = lzwMinCode +1;          //maskSize init
 
             actCodeValue =  L_gifGetBitFieldValue16(codeStream, &bitPtr, maskSize);
 
@@ -651,15 +644,15 @@ void L_gifLzw(void *codeStream, L_GifFile *gif, unsigned int lzwMinCode)
 
         if(actCodeValue == EOICode)
         {
-            fprintf(stderr,"received EOI at %d; should be %d\n", count, indexNum);
+            fprintf(stderr, "Warning at %s %d : received EOI at %d; should be %d\n", __FUNCTION__, __LINE__, count, indexNum);
             break;
         }
 
         if(actCodeValue < codeTable.actSize)
-        {/**is CODE in the code table? Yes:**/
+        {//is CODE in the code table? Yes:
 
             uint8_t string0 = L_gifDicoGetFirstOfString(&codeTable, codeTable.entry[actCodeValue]);
-            /*output {CODE} to index stream */
+            //output {CODE} to index stream
             L_gifDicoStringOutput(&codeTable, codeTable.entry[actCodeValue], indexStream, &count, indexNum);
 
             codeTable.entry[codeTable.actSize].prev  = prevCodeValue;
@@ -671,7 +664,7 @@ void L_gifLzw(void *codeStream, L_GifFile *gif, unsigned int lzwMinCode)
             codeTable.actSize++;
         }
         else
-        {/**is CODE in the code table? No:**/
+        {//is CODE in the code table? No:
 
             uint8_t prevString0 = L_gifDicoGetFirstOfString(&codeTable, prevString);
 
@@ -686,24 +679,22 @@ void L_gifLzw(void *codeStream, L_GifFile *gif, unsigned int lzwMinCode)
         }
 
         if (codeTable.actSize == (1<<(maskSize)))
-        {/*if index reaches max value for actMask*/
+        {//if index reaches max value for actMask
 
-            maskSize++; /*maskSize increase*/
+            maskSize++; //maskSize increases
 
-            if (maskSize>=13) /*max gif mask is 12 bits by spec*/
-                maskSize = 12;/*limited to 12*/
+            if (maskSize >= 13) //max gif mask is 12 bits by spec
+                maskSize = 12;//limited to 12
         }
     }
 
-    /** POST **/
-
-    /*image data =  index stream*/
+    //image data = index stream
     gif->image[gif->imgNum-1].imageData = indexStream;
 }
 
 
 uint16_t L_gifGetBitFieldValue16(void *data, unsigned int *bitStart, size_t maskSize)
-{/*16 bits value extraction*/
+{//16 bits value extraction
 
     uint32_t value  = 0,
              mask   = (1<<maskSize) - 1;
@@ -724,7 +715,7 @@ uint16_t L_gifGetBitFieldValue16(void *data, unsigned int *bitStart, size_t mask
 
 
 void L_gifDicoInit(L_GifDico * dico, unsigned int code)
-{/*init dictionnary*/
+{//init dictionnary
     int i;
 
     dico->actSize = code+2;
@@ -736,6 +727,7 @@ void L_gifDicoInit(L_GifDico * dico, unsigned int code)
     }
 }
 
+//managing dictionnary
 
 uint8_t L_gifDicoGetFirstOfString(L_GifDico *dico, L_GifDicoEntry entry)
 {
