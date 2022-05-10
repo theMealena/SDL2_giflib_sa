@@ -74,7 +74,7 @@ the animation mode through CEV_gifLoopMode().
 
 Note that you can use CEV_gifAnimLoadRW(SDL_RWops* ops, SDL_Renderer* renderer, char freeSrc) if
 you intend to open file trough SDL_RWops*.
-- if freeSrc different from 0, th function will close the SDL_RWops for you when gif
+- if freeSrc is different from 0, the function will close the SDL_RWops for you when gif
 is fully loaded.
 
 
@@ -113,8 +113,8 @@ Basic Code :
 		SDL_RenderPresent(myRender);
 	}
 	
-Thus, though acttexture state is modified by CEV_gifAnimAuto(),
-you can endlessely blit acttexture.
+Thus, though actTexture state is modified by CEV_gifAnimAuto(),
+you can endlessely blit actTexture.
 Mostly, you can store it anywhere once for all without having to worry
 about it to change.
 
@@ -225,7 +225,7 @@ Return value is 0 once the GIF_ONCE_XXX animation has been executed and is stuck
 /*************************************************************/
 
 -----------------------------------------------------------------
-void CEV_gifSpeedSet(CEV_GifAnim *anim, int frameNum, int delayms)
+void CEV_gifTimeSet(CEV_GifAnim *anim, int frameNum, int delayms)
 ------------------------------------------------------------------
 
 Display delay is basically set to the value set by the original gif file, frame by frame.
@@ -346,7 +346,7 @@ _______________________________________________________________________
 #include <stdlib.h>
 #include <SDL.h>
 #include <stdint.h>
-#include "SDL2_gif.h"
+#include "CEV_gif.h"
 
 int main ( int argc, char* argv[] )
 {
