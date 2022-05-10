@@ -15,7 +15,7 @@
 #include <SDL.h>
 
 
-//#if SDL_BYTEORDER == SDL_BIG_ENDIAN //SDL1 only
+//#if SDL_BYTEORDER == SDL_BIG_ENDIAN //SDL1.x only
 
 
     #define   RMASK  0xff000000
@@ -23,22 +23,22 @@
     #define   BMASK  0x0000ff00
     #define   AMASK  0x000000ff
 
-    #define COLOR_R(X) ((X&RMASK)>>24)
-    #define COLOR_G(X) ((X&GMASK)>>16)
-    #define COLOR_B(X) ((X&BMASK)>>8)
-    #define COLOR_A(X) (X&AMASK)
+    #define COLOR_R(X) ((X & RMASK)>>24)
+    #define COLOR_G(X) ((X & GMASK)>>16)
+    #define COLOR_B(X) ((X & BMASK)>>8)
+    #define COLOR_A(X) (X & AMASK)
 
-/*#else //SDL1 Only
+/*#else //SDL1.x Only
 
     #define RMASK  0x000000ff
     #define GMASK  0x0000ff00
     #define BMASK  0x00ff0000
     #define AMASK  0xff000000
 
-    #define COLOR_R(X) (X&RMASK)
-    #define COLOR_G(X) ((X&GMASK)>>8)
-    #define COLOR_B(X) ((X&BMASK)>>16)
-    #define COLOR_A(X) ((X&AMASK)>>24)
+    #define COLOR_R(X) (X & RMASK)
+    #define COLOR_G(X) ((X & GMASK)>>8)
+    #define COLOR_B(X) ((X & BMASK)>>16)
+    #define COLOR_A(X) ((X & AMASK)>>24)
 
 #endif
 */

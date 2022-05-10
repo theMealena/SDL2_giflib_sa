@@ -2,6 +2,7 @@
 //** Done by  |      Date     |  version |    comment     **/
 //**------------------------------------------------------**/
 //**   CEV    |    05-2016    |   1.0    |  creation/SDL2 **/
+//**   CEV    |    05-2022    |   1.0    | doxy doc compliant**/
 //**********************************************************/
 
 #ifndef GIFUSER_H_INCLUDED
@@ -33,7 +34,8 @@ typedef enum GIF_MODE
 GIF_MODE;
 
 
-
+/** \brief function return values
+ */
 enum
 {
     GIF_FATAL   = -2,
